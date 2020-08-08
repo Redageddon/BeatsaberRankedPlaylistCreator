@@ -37,6 +37,5 @@ https://www.youtube.com/channel/UC857d3qTkUtfYtEGuIfSxNg
 https://steamcommunity.com/id/rubiksmaster02  
 https://github.com/rubiksmaster02  
 
-```
+
 Collaborators: Simme63
-```
