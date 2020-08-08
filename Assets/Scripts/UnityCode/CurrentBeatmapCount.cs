@@ -10,7 +10,7 @@ namespace UnityCode
     {
         public static int CurrentMapCount { get; private set; }
 
-        private void Start()
+        private void OnEnable()
         {
             if (CurrentMapCount == 0)
             {
