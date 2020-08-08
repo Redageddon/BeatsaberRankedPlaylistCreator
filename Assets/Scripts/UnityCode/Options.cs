@@ -7,13 +7,17 @@ namespace UnityCode
     [Serializable]
     public class Options
     {
+        private const string settingsPath = "Settings.json";
+        
         static Options()
         {
-            string settingsPath = "Settings.json";
             if (!File.Exists(settingsPath))
             {
                 Default = new Options();
-                File.WriteAllText(settingsPath, JsonConvert.SerializeObject(Default));
+                
+                string json = JsonConvert.SerializeObject(Default);
+                
+                File.WriteAllText(settingsPath,json);
             }
             else
             {

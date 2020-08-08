@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 21
-  productGUID: b85ad3347f2bede448e5496f45d1b511
+  productGUID: 1ee500623dd45b044b75565d6aeac705
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -506,7 +506,7 @@ PlayerSettings:
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}
   managedStrippingLevel:
-    Standalone: 3
+    Standalone: 0
   incrementalIl2cppBuild: {}
   allowUnsafeCode: 0
   useDeterministicCompilation: 1

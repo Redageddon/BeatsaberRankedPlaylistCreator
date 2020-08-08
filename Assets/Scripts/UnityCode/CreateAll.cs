@@ -16,10 +16,9 @@ namespace UnityCode
             LoadLoggingScene();
             
             ProcessedBeatmapNotifier.SendNotification("Calculating max beatmap count...");
-            int maxCount = await GetCurrentBeatmapCount();
-            
+
             ProcessedBeatmapNotifier.SendNotification("Beatmap processing started...");
-            await CreateAllPlaylistCreators(maxCount);
+            await CreateAllPlaylistCreators(CurrentBeatmapCount.CurrentMapCount);
             
             ProcessedBeatmapNotifier.SendNotification("All beatmaps processed.");
             BeatmapLog.SaveLog();
@@ -27,17 +26,6 @@ namespace UnityCode
         }
 
         private static void LoadLoggingScene() => SceneManager.LoadScene("LoggingScene", LoadSceneMode.Single);
-
-        private static async Task<int> GetCurrentBeatmapCount()
-        {
-            using WebClient webClient = new WebClient();
-
-            string allData =
-                await webClient.DownloadStringTaskAsync(
-                    "http://scoresaber.com/api.php?function=get-leaderboards&page=1&limit=10000&unique=1&ranked=1");
-
-            return (JObject.Parse(allData)["songs"] ?? throw new NullReferenceException()).Count();
-        }
 
         private static async Task CreateAllPlaylistCreators(int count) =>
             await Task.WhenAll(PlaylistCreator.CreateAllLists(count, 20,    CatType.DateRanked),
