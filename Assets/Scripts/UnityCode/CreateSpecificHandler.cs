@@ -13,9 +13,9 @@ namespace UnityCode
     public class CreateSpecificHandler : MonoBehaviour
     {
         [SerializeField] private Text text;
-        private int beatmapCount;
-        private int playlistSize;
-        private CatType catType;
+        private int beatmapCount = 0;
+        private int playlistSize = 0;
+        private CatType catType = CatType.DateRanked;
 
         private void Start()
         {
@@ -29,7 +29,7 @@ namespace UnityCode
         
         public void PlaylistSizeValueChanged(string value) => int.TryParse(value, out this.playlistSize);
         
-        public void CategoryValueChanged(int value) => this.catType = (CatType)value;
+        public void CategoryValueChanged(int value) => this.catType = (CatType)(value + 1);
 
         public async void CreatePlaylistOnClick()
         {
