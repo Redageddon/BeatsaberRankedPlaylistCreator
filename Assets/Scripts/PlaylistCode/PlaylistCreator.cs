@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using UnityCode;
+using UnityEngine;
 
 namespace PlaylistCode
 {
@@ -29,10 +30,11 @@ namespace PlaylistCode
         /// <param name="type"> The category type of beatmap playlist. </param>
         public static async Task CreateAllLists(int mapCount, int playlistSize, CatType type)
         {
-            string       categoryType = $"&cat={type}";
+            string       categoryType = $"&cat={(int)type}";
             string       limit        = $"&limit={mapCount}";
             const string isUnique     = "&unique=1";
             const string isRanked     = "&ranked=1";
+            Debug.Log(categoryType);
 
             (IEnumerable<string> allIds, IEnumerable<string> allNames) = await GetAllIdsAndNames(categoryType, limit, isUnique, isRanked);
             LogAllNames(allNames);
