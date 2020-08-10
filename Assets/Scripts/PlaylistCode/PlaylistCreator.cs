@@ -34,7 +34,6 @@ namespace PlaylistCode
             string       limit        = $"&limit={mapCount}";
             const string isUnique     = "&unique=1";
             const string isRanked     = "&ranked=1";
-            Debug.Log(categoryType);
 
             (IEnumerable<string> allIds, IEnumerable<string> allNames) = await GetAllIdsAndNames(categoryType, limit, isUnique, isRanked);
             LogAllNames(allNames);
@@ -56,25 +55,25 @@ namespace PlaylistCode
 
         private static async Task CreateLists(int mapCount, int playlistSize, IEnumerable<string> idList, CatType catType)
         {
-            IEnumerable<Task> tasks = Enumerable.Range(0, (int)Math.Ceiling(mapCount / (double)playlistSize))
+           IEnumerable<Task> tasks = Enumerable.Range(0, (int)Math.Ceiling(mapCount / (double)playlistSize))
                                                 .Select(i => CreateBeatMapPlaylist(mapCount, playlistSize, idList, catType, i));
-
-            await Task.WhenAll(tasks);
+           await Task.WhenAll(tasks);
             ProcessedBeatmapNotifier.SendNotification($"Playlist size: {playlistSize}, Category: {catType}, finished");
         }
 
-        private static async Task CreateBeatMapPlaylist(int mapCount, int beatmapSize, IEnumerable<string> idList, CatType catType, int i)
+        private static async Task CreateBeatMapPlaylist(int mapCount, int playlistSize, IEnumerable<string> idList, CatType catType, int i)
         {
-            int        trueValue = Math.Min(mapCount - (beatmapSize * i), beatmapSize);
+            int trueValue = Math.Min(mapCount - (playlistSize * i), playlistSize);
+               
             HashBase[] hashBases = new HashBase[trueValue];
             
             for (int j = 0; j < trueValue; j++)
             {
-                hashBases[j] = new HashBase { Hash = idList.ElementAt(j) };
+                hashBases[j] = new HashBase { Hash = idList.ElementAt(j + (playlistSize * i)) };
             }
-            
-            byte[] imageData = await GetImageData(idList.ElementAt(i));
-            new BeatMapPlaylist(imageData, hashBases, i, beatmapSize, catType);
+               
+            byte[] imageData = await GetImageData(idList.ElementAt(i * playlistSize));
+            new BeatMapPlaylist(imageData, hashBases, i, playlistSize, catType);
         }
 
         private static async Task<byte[]> GetImageData(string hash)
