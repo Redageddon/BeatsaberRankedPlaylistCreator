@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using UnityCode;
-using UnityEngine;
 
 namespace PlaylistCode
 {
@@ -14,7 +13,7 @@ namespace PlaylistCode
     /// </summary>
     public static class PlaylistCreator
     {
-        private const string BeatSaverLink   = "https://beatsaver.com";
+        private const string BeatSaverLink = "https://beatsaver.com";
         private const string MockBrowserName = "user-agent";
 
         private const string MockBrowserValue =
@@ -30,24 +29,28 @@ namespace PlaylistCode
         /// <param name="type"> The category type of beatmap playlist. </param>
         public static async Task CreateAllLists(int mapCount, int playlistSize, CatType type)
         {
-            string       categoryType = $"&cat={(int)type}";
-            string       limit        = $"&limit={mapCount}";
-            const string isUnique     = "&unique=1";
-            const string isRanked     = "&ranked=1";
+            string categoryType = $"&cat={(int)type}";
+            string limit = $"&limit={mapCount}";
+            const string isUnique = "&unique=1";
+            const string isRanked = "&ranked=1";
 
             (IEnumerable<string> allIds, IEnumerable<string> allNames) = await GetAllIdsAndNames(categoryType, limit, isUnique, isRanked);
             LogAllNames(allNames);
             await CreateLists(mapCount, playlistSize, allIds, type);
         }
 
-        private static async Task<(IEnumerable<string>, IEnumerable<string>)> GetAllIdsAndNames(string categoryType, string limit, string isUnique, string isRanked)
+        private static async Task<(IEnumerable<string>, IEnumerable<string>)> GetAllIdsAndNames(
+            string categoryType,
+            string limit,
+            string isUnique,
+            string isRanked)
         {
             using WebClient webClient = new WebClient();
-            string          allData   = await webClient.DownloadStringTaskAsync(ScoreSaberApiLink + categoryType + limit + isUnique + isRanked);
+            string allData = await webClient.DownloadStringTaskAsync(ScoreSaberApiLink + categoryType + limit + isUnique + isRanked);
 
             JToken allSongs = JObject.Parse(allData)["songs"] ?? throw new NullReferenceException();
 
-            IEnumerable<string> allIds   = allSongs.Select(i => i["id"].ToString().ToUpper());
+            IEnumerable<string> allIds = allSongs.Select(i => i["id"].ToString().ToUpper());
             IEnumerable<string> allNames = allSongs.Select(i => i["name"].ToString());
 
             return (allIds, allNames);
@@ -55,39 +58,48 @@ namespace PlaylistCode
 
         private static async Task CreateLists(int mapCount, int playlistSize, IEnumerable<string> idList, CatType catType)
         {
-           IEnumerable<Task> tasks = Enumerable.Range(0, (int)Math.Ceiling(mapCount / (double)playlistSize))
+            IEnumerable<Task> tasks = Enumerable.Range(0, (int)Math.Ceiling(mapCount / (double)playlistSize))
                                                 .Select(i => CreateBeatMapPlaylist(mapCount, playlistSize, idList, catType, i));
-           await Task.WhenAll(tasks);
+
+            await Task.WhenAll(tasks);
             ProcessedBeatmapNotifier.SendNotification($"Playlist size: {playlistSize}, Category: {catType}, finished");
         }
 
         private static async Task CreateBeatMapPlaylist(int mapCount, int playlistSize, IEnumerable<string> idList, CatType catType, int i)
         {
             int trueValue = Math.Min(mapCount - (playlistSize * i), playlistSize);
-               
+
             HashBase[] hashBases = new HashBase[trueValue];
-            
+
             for (int j = 0; j < trueValue; j++)
             {
                 hashBases[j] = new HashBase { Hash = idList.ElementAt(j + (playlistSize * i)) };
             }
-               
+
             byte[] imageData = await GetImageData(idList.ElementAt(i * playlistSize));
             new BeatMapPlaylist(imageData, hashBases, i, playlistSize, catType);
         }
 
         private static async Task<byte[]> GetImageData(string hash)
         {
-            using WebClient webClient = new WebClient();
-            webClient.Headers.Add(MockBrowserName, MockBrowserValue);
+            try
+            {
+                using WebClient webClient = new WebClient();
+                webClient.Headers.Add(MockBrowserName, MockBrowserValue);
 
-            string allData = await webClient.DownloadStringTaskAsync(BeatSaverLink + "/api/maps/by-hash/" + hash);
-            string url     = BeatSaverLink + JObject.Parse(allData)["coverURL"];
+                string allData = await webClient.DownloadStringTaskAsync(BeatSaverLink + "/api/maps/by-hash/" + hash);
+                string url = BeatSaverLink + JObject.Parse(allData)["coverURL"];
 
-            webClient.Headers.Add(MockBrowserName, MockBrowserValue);
+                webClient.Headers.Add(MockBrowserName, MockBrowserValue);
 
-            byte[] imageBytes = await webClient.DownloadDataTaskAsync(url);
-            return imageBytes;
+                byte[] imageBytes = await webClient.DownloadDataTaskAsync(url);
+
+                return imageBytes;
+            }
+            catch (Exception)
+            {
+                return Array.Empty<byte>();
+            }
         }
 
         private static void LogAllNames(IEnumerable<string> allNames)
