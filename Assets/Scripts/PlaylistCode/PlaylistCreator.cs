@@ -73,7 +73,7 @@ namespace PlaylistCode
 
             for (int j = 0; j < trueValue; j++)
             {
-                hashBases[j] = new HashBase { Hash = idList.ElementAt(j + (playlistSize * i)) };
+                hashBases[j] = new HashBase { hash = idList.ElementAt(j + (playlistSize * i)) };
             }
 
             byte[] imageData = await GetImageData(idList.ElementAt(i * playlistSize));

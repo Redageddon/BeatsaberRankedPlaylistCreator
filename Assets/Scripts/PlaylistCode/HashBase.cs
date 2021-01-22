@@ -9,6 +9,6 @@ namespace PlaylistCode
     public struct HashBase
     {
         /// <summary> The hash/id of the current song. </summary>
-        public string Hash;
+        public string hash;
     }
 }
