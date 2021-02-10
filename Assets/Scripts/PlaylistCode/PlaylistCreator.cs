@@ -53,7 +53,7 @@ namespace PlaylistCode
             IEnumerable<string> allIds = allSongs.Select(i => i["id"].ToString().ToUpper());
             IEnumerable<string> allNames = allSongs.Select(i => i["name"].ToString());
 
-            return (allIds, allNames);
+            return categoryType == "&cat=1" ? (allIds.Reverse(), allNames.Reverse()) : (allIds, allNames);
         }
 
         private static async Task CreateLists(int mapCount, int playlistSize, IEnumerable<string> idList, CatType catType)

@@ -26,6 +26,6 @@ namespace UnityCode
         }
         public static Options Default { get; }
 
-        public bool UseOutputImage { get; set; }
+        public bool UseOutputImage { get; set; } = false;
     }
 }
